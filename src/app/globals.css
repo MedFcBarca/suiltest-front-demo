@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
+:root{
+  --ink: #0b1220;
+  --navy: #132238;
+  --teal: #0ea5a4;
+  --mint: #bfeee7;
+  --sun: #ffd304;
+  --paper: #fbfbfb;
+  --line: rgba(15, 23, 42, .10);
+}
+
+body{
+  background: var(--paper);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.smooth {
+  transition: all 220ms var(--ease-out);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.card-hover {
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out), background 220ms var(--ease-out);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.soft-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(11, 18, 32, 0.18);
+}
+
+.fade-in {
+  animation: fadeIn 320ms var(--ease-out) both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
