@@ -21,6 +21,9 @@ export default function StudentsPage() {
   const [q, setQ] = React.useState("");
   const [cohortId, setCohortId] = React.useState<string>("all");
 
+  const searchId = React.useId();
+  const cohortSelectId = React.useId();
+
   const students = studentsQ.data ?? [];
   const cohorts = cohortsQ.data ?? [];
 
@@ -28,28 +31,46 @@ export default function StudentsPage() {
     .filter((s) => (cohortId === "all" ? true : s.cohortId === cohortId))
     .filter((s) => s.name.toLowerCase().includes(q.toLowerCase()));
 
-
+    
   if (studentsQ.isLoading) {
-  return (
-    <main className="grid gap-3">
-      <Skeleton className="h-[90px]" />
+    return (
+      <main className="grid gap-3">
+        <Skeleton className="h-[90px]" />
 
-      <Card className="p-3">
-        <div className="grid gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-[64px]" />
-          ))}
-        </div>
-      </Card>
-    </main>
-  );
-}
+        <Card className="p-3">
+          <div className="grid gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-[64px]" />
+            ))}
+          </div>
+        </Card>
+      </main>
+    );
+  }
+
+  if (studentsQ.isError) {
+    return (
+      <main className="grid gap-3">
+        <Card className="p-6">
+          <div className="text-sm font-semibold text-[var(--ink)]">
+            Impossible de charger les étudiants
+          </div>
+          <p className="mt-1 text-sm text-neutral-600">
+            Vérifie ta connexion ou réessaie.
+          </p>
+        </Card>
+      </main>
+    );
+  }
+
   return (
     <main className="grid gap-4">
       <Card className="p-6 card-hover">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-semibold text-[var(--ink)]">Students</div>
+            <h1 className="text-sm font-semibold text-[var(--ink)]">
+              Students
+            </h1>
             <p className="mt-1 text-sm text-neutral-600">
               Search & filter by cohort.
             </p>
@@ -62,19 +83,26 @@ export default function StudentsPage() {
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-[1fr_220px]">
-          <label className="grid gap-1">
-            <span className="text-xs text-neutral-600">Search</span>
+          <div className="grid gap-1">
+            <label htmlFor={searchId} className="text-xs text-neutral-600">
+              Search
+            </label>
             <input
+              id={searchId}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="h-11 rounded-2xl border border-[var(--line)] bg-white/70 px-4 outline-none focus:ring-2 focus:ring-[var(--ink)]"
               placeholder="Search student…"
+              autoComplete="off"
             />
-          </label>
+          </div>
 
-          <label className="grid gap-1">
-            <span className="text-xs text-neutral-600">Cohort</span>
+          <div className="grid gap-1">
+            <label htmlFor={cohortSelectId} className="text-xs text-neutral-600">
+              Cohort
+            </label>
             <select
+              id={cohortSelectId}
               value={cohortId}
               onChange={(e) => setCohortId(e.target.value)}
               className="h-11 rounded-2xl border border-[var(--line)] bg-white/70 px-3 outline-none focus:ring-2 focus:ring-[var(--ink)]"
@@ -86,13 +114,17 @@ export default function StudentsPage() {
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         </div>
       </Card>
 
       <Card className="p-3">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
+            <caption className="sr-only">
+              Students list with cohort, completion and score
+            </caption>
+
             <thead className="text-left text-neutral-600">
               <tr className="border-b border-[var(--line)]">
                 <th className="p-4">Student</th>
@@ -105,15 +137,25 @@ export default function StudentsPage() {
 
             <tbody>
               {filtered.map((s) => (
-                <tr key={s.id} className="border-b border-[var(--line)] last:border-b-0 hover:bg-white/50">
+                <tr
+                  key={s.id}
+                  className="border-b border-[var(--line)] last:border-b-0 hover:bg-white/50"
+                >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-2xl bg-[var(--teal)]/15 text-[var(--ink)] grid place-items-center font-semibold">
+                      <div
+                        className="h-10 w-10 rounded-2xl bg-[var(--teal)]/15 text-[var(--ink)] grid place-items-center font-semibold"
+                        aria-hidden="true"
+                      >
                         {initials(s.name)}
                       </div>
                       <div>
-                        <div className="font-semibold text-[var(--ink)]">{s.name}</div>
-                        <div className="text-xs text-neutral-600">ID #{s.id}</div>
+                        <div className="font-semibold text-[var(--ink)]">
+                          {s.name}
+                        </div>
+                        <div className="text-xs text-neutral-600">
+                          ID #{s.id}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -125,17 +167,26 @@ export default function StudentsPage() {
                   <td className="p-4">
                     <div className="min-w-[180px]">
                       <div className="flex items-center justify-between text-xs text-neutral-600">
-                        <span>Progress</span>
-                        <span className="font-medium text-[var(--ink)]">{s.completion}%</span>
+                        <span>Completion</span>
+                        <span className="font-medium text-[var(--ink)]">
+                          {s.completion}%
+                        </span>
                       </div>
+
                       <div className="mt-2">
-                        <Progress value={s.completion} barClassName="bg-[var(--sun)]" />
+                        <Progress
+                          value={s.completion}
+                          barClassName="bg-[var(--sun)]"
+                          label="Completion"
+                        />
                       </div>
                     </div>
                   </td>
 
                   <td className="p-4">
-                    <div className="font-semibold text-[var(--ink)]">{s.score}</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {s.score}
+                    </div>
                     <div className="text-xs text-neutral-600">/100</div>
                   </td>
 
@@ -143,6 +194,7 @@ export default function StudentsPage() {
                     <Link
                       className="text-sm font-semibold text-[var(--ink)] hover:underline"
                       href={`/console/students/${s.id}`}
+                      aria-label={`View details for ${s.name}`}
                     >
                       View →
                     </Link>
@@ -152,7 +204,10 @@ export default function StudentsPage() {
 
               {filtered.length === 0 && (
                 <tr>
-                  <td className="p-8 text-center text-sm text-neutral-600" colSpan={5}>
+                  <td
+                    className="p-8 text-center text-sm text-neutral-600"
+                    colSpan={5}
+                  >
                     No students match your search.
                   </td>
                 </tr>
