@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-const StudentSchema = z.object({
+export const StudentSchema = z.object({
   id: z.string(),
   name: z.string(),
   cohortId: z.string(),
@@ -13,7 +13,7 @@ const StudentSchema = z.object({
     transitions: z.number(),
   }),
 });
-const StudentsResponse = z.object({ items: z.array(StudentSchema) });
+export const StudentsResponse = z.object({ items: z.array(StudentSchema) });
 
 export type Student = z.infer<typeof StudentSchema>;
 
