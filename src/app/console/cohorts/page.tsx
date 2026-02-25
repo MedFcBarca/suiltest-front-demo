@@ -24,6 +24,30 @@ export default function CohortsPage() {
       </main>
     );
   }
+  
+    if (q.isError) {
+    return (
+      <main className="grid gap-3">
+        <Card className="p-6">
+          <div className="text-sm font-semibold text-[var(--ink)]">
+            Impossible de charger les cohortes
+          </div>
+          <p className="mt-1 text-sm text-neutral-600">
+            Vérifie ta connexion ou réessaie.
+          </p>
+
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={() => q.refetch()}
+              className="rounded-xl border border-[var(--line)] px-3 py-2 text-sm font-semibold hover:bg-neutral-50"
+            >
+              Retry
+            </button>
+          </div>
+        </Card>
+      </main>
+    );
+  }
 
   const cohorts = q.data ?? [];
 
