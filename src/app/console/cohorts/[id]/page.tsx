@@ -273,7 +273,7 @@ export default function CohortDetail() {
                         <span className="font-medium text-[var(--ink)]">{s.completion}%</span>
                       </div>
                       <div className="mt-2">
-                        <Progress value={s.completion} barClassName="bg-[var(--sun)]" />
+                        <Progress value={s.completion} barClassName="bg-[var(--sun)]" label="Completion" />
                       </div>
                     </div>
                   </td>

@@ -17,5 +17,5 @@ export function Button({ variant = "primary", className = "", ...props }: Props)
       ? "bg-white text-[var(--ink)] border border-[var(--line)] hover:bg-neutral-50 focus-visible:ring-[var(--ink)]"
       : "bg-transparent text-[var(--ink)] hover:bg-neutral-100 focus-visible:ring-[var(--ink)]";
 
-  return <button className={`${base} ${v} ${className}`} {...props} />;
+  return <button type={props.type ?? "button"} className={`${base} ${v} ${className}`} {...props} />;
 }
