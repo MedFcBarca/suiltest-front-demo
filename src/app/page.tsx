@@ -15,9 +15,14 @@ export default function HomePage() {
           <span className="text-neutral-500"> • Demo</span>
         </div>
         <div className="flex gap-2">
-          <Link href="/login"><Button variant="secondary">Login</Button></Link>
-          <Link href="/console/dashboard"><Button>Open Console</Button></Link>
-        </div>
+  <Link href="/login">
+    <Button variant="secondary">Login</Button>
+  </Link>
+
+  <Link href="/register">
+    <Button>Create account</Button>
+  </Link>
+</div>
       </header>
 
       <section className="mx-auto max-w-6xl px-6 pt-10 pb-16">
@@ -37,10 +42,18 @@ export default function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/console/dashboard"><Button>Explore dashboard</Button></Link>
-              <Link href="/student"><Button>Explore student</Button></Link>
-              <Link href="/login"><Button variant="ghost">Login</Button></Link>
-            </div>
+  <Link href="/register">
+    <Button>Create account</Button>
+  </Link>
+
+  <Link href="/login">
+    <Button variant="secondary">Login</Button>
+  </Link>
+
+  <Link href="/console/dashboard">
+    <Button variant="ghost">Explore demo</Button>
+  </Link>
+</div>
 
             <div className="mt-10 grid gap-3 md:grid-cols-3">
               <Mini title="Measure" desc="Scores & completion." />
