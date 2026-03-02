@@ -9,7 +9,6 @@ import { Badge } from "@/app/components/ui/Badge";
 type Role = "teacher" | "student";
 
 function isEmail(value: string) {
-  // simple & testable (Jest)
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
@@ -41,7 +40,6 @@ export default function LoginPage() {
     e.preventDefault();
     setFormError(null);
 
-    // Front validation (fast feedback)
     if (!isEmail(email)) {
       setFormError("Please enter a valid email.");
       return;
@@ -54,7 +52,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       /**
-       * Ici tu brancheras ton vrai auth:
+       * Ici je brancheras le vrai auth:
        * - NextAuth / custom API / etc.
        * - idéalement via fetch + cookies httpOnly côté serveur
        *
@@ -89,7 +87,6 @@ export default function LoginPage() {
           <Badge tone="sun">demo</Badge>
         </header>
 
-        {/* Role switch (polished interaction) */}
         <div className="mt-5 grid grid-cols-2 gap-2 rounded-3xl bg-white/60 p-2 border border-[var(--line)]">
           <button
             type="button"
@@ -120,7 +117,6 @@ export default function LoginPage() {
         </div>
 
         <form className="mt-6 grid gap-3" onSubmit={onSubmit} noValidate>
-          {/* Global error (WCAG) */}
           {formError && (
             <div
               className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
@@ -130,7 +126,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Email */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Email</span>
             <input
@@ -139,6 +134,7 @@ export default function LoginPage() {
                 "focus:ring-2 focus:ring-[var(--ink)]",
                 emailError ? "border-red-300" : "border-[var(--line)]",
               ].join(" ")}
+              data-cy="login-email"
               type="email"
               inputMode="email"
               autoComplete="email"
@@ -156,7 +152,6 @@ export default function LoginPage() {
             )}
           </label>
 
-          {/* Password + show/hide */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Password</span>
 
@@ -168,6 +163,7 @@ export default function LoginPage() {
               ].join(" ")}
             >
               <input
+                data-cy="login-password"
                 className="h-full flex-1 bg-transparent outline-none"
                 type={showPw ? "text" : "password"}
                 autoComplete="current-password"
@@ -197,10 +193,10 @@ export default function LoginPage() {
             )}
           </label>
 
-          {/* Remember + forgot */}
           <div className="mt-1 flex items-center justify-between gap-3">
             <label className="flex items-center gap-2 text-sm text-neutral-700 select-none">
               <input
+                data-cy="login-remember"
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
@@ -215,7 +211,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-2 grid gap-2">
-            <Button className="w-full" type="submit" disabled={!canSubmit}>
+            <Button data-cy="login-submit" className="w-full" type="submit" disabled={!canSubmit}>
               {isSubmitting ? "Signing in…" : `Sign in as ${role === "teacher" ? "Teacher" : "Student"}`}
             </Button>
 
@@ -241,7 +237,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Small footer hint (context) */}
           <p className="mt-2 text-xs text-neutral-500 text-center">
             Optimized for accessibility & performance (WCAG-friendly UI).
           </p>

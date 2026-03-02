@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/app/components/ui/Card";
 import { Button } from "@/app/components/ui/Button";
 import { Badge } from "@/app/components/ui/Badge";
@@ -13,12 +14,13 @@ function isEmail(value: string) {
 }
 
 function strongEnoughPassword(value: string) {
-  // simple rule: >= 10, at least 1 letter and 1 number
   const v = value.trim();
   return v.length >= 10 && /[A-Za-z]/.test(v) && /\d/.test(v);
 }
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const [role, setRole] = useState<Role>("teacher");
 
   const [fullName, setFullName] = useState("");
@@ -35,11 +37,14 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  const normalizedName = fullName.trim();
+  const normalizedEmail = email.trim();
+
   const fullNameError = useMemo(() => {
     if (!fullName) return null;
-    if (fullName.trim().length < 2) return "Please enter your full name.";
+    if (normalizedName.length < 2) return "Please enter your full name.";
     return null;
-  }, [fullName]);
+  }, [fullName, normalizedName]);
 
   const emailError = useMemo(() => {
     if (!email) return null;
@@ -49,9 +54,7 @@ export default function RegisterPage() {
 
   const passwordError = useMemo(() => {
     if (!password) return null;
-    if (!strongEnoughPassword(password)) {
-      return "Use 10+ chars with letters and numbers.";
-    }
+    if (!strongEnoughPassword(password)) return "Use 10+ chars with letters and numbers.";
     return null;
   }, [password]);
 
@@ -61,27 +64,17 @@ export default function RegisterPage() {
     return null;
   }, [confirmPassword, password]);
 
-  const canSubmit =
-    !isSubmitting &&
-    !!fullName &&
-    !!email &&
-    !!password &&
-    !!confirmPassword &&
-    acceptTerms &&
-    !fullNameError &&
-    !emailError &&
-    !passwordError &&
-    !confirmError;
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isSubmitting) return;
+
     setFormError(null);
 
-    if (fullName.trim().length < 2) {
+    if (normalizedName.length < 2) {
       setFormError("Please enter your full name.");
       return;
     }
-    if (!isEmail(email)) {
+    if (!isEmail(normalizedEmail)) {
       setFormError("Please enter a valid email.");
       return;
     }
@@ -100,19 +93,8 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      /**
-       * Ici tu brancheras l’API:
-       * await fetch("/api/auth/register", { method:"POST", body: JSON.stringify(...) })
-       *
-       * Bonnes pratiques:
-       * - envoyer via HTTPS
-       * - côté serveur: créer user + email verification
-       * - session/cookies httpOnly
-       */
       await new Promise((r) => setTimeout(r, 600));
-
-      // Demo redirect
-      window.location.href = role === "teacher" ? "/console/dashboard" : "/student";
+      router.push(role === "teacher" ? "/console/dashboard" : "/student");
     } catch {
       setFormError("Registration failed. Please try again.");
     } finally {
@@ -138,7 +120,6 @@ export default function RegisterPage() {
           <Badge tone="sun">demo</Badge>
         </header>
 
-        {/* Role switch */}
         <div className="mt-5 grid grid-cols-2 gap-2 rounded-3xl bg-white/60 p-2 border border-[var(--line)]">
           <button
             type="button"
@@ -168,20 +149,26 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        <form className="mt-6 grid gap-3" onSubmit={onSubmit} noValidate>
+        <form
+          className="mt-6 grid gap-3"
+          onSubmit={onSubmit}
+          noValidate
+          aria-busy={isSubmitting}
+        >
           {formError && (
             <div
               className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
               role="alert"
+              aria-live="polite"
             >
               {formError}
             </div>
           )}
 
-          {/* Full name */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Full name</span>
             <input
+              data-cy="register-name"
               className={[
                 "h-11 rounded-2xl border bg-white/70 px-4 outline-none",
                 "focus:ring-2 focus:ring-[var(--ink)]",
@@ -203,10 +190,10 @@ export default function RegisterPage() {
             )}
           </label>
 
-          {/* Email */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Email</span>
             <input
+              data-cy="register-email"
               className={[
                 "h-11 rounded-2xl border bg-white/70 px-4 outline-none",
                 "focus:ring-2 focus:ring-[var(--ink)]",
@@ -229,7 +216,6 @@ export default function RegisterPage() {
             )}
           </label>
 
-          {/* Password */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Password</span>
 
@@ -241,6 +227,7 @@ export default function RegisterPage() {
               ].join(" ")}
             >
               <input
+                data-cy="register-password"
                 className="h-full flex-1 bg-transparent outline-none"
                 type={showPw ? "text" : "password"}
                 autoComplete="new-password"
@@ -272,7 +259,6 @@ export default function RegisterPage() {
             )}
           </label>
 
-          {/* Confirm password */}
           <label className="grid gap-1">
             <span className="text-sm font-medium text-[var(--ink)]">Confirm password</span>
 
@@ -284,6 +270,7 @@ export default function RegisterPage() {
               ].join(" ")}
             >
               <input
+                data-cy="register-confirm"
                 className="h-full flex-1 bg-transparent outline-none"
                 type={showPw2 ? "text" : "password"}
                 autoComplete="new-password"
@@ -312,9 +299,9 @@ export default function RegisterPage() {
             )}
           </label>
 
-          {/* Terms */}
           <label className="mt-1 flex items-start gap-3 text-sm text-neutral-700 select-none">
             <input
+              data-cy="register-terms"
               type="checkbox"
               checked={acceptTerms}
               onChange={(e) => setAcceptTerms(e.target.checked)}
@@ -335,7 +322,12 @@ export default function RegisterPage() {
           </label>
 
           <div className="mt-2 grid gap-2">
-            <Button className="w-full" type="submit" disabled={!canSubmit}>
+            <Button
+              data-cy="register-submit"
+              className="w-full"
+              type="submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Creating account…" : "Create account"}
             </Button>
 
@@ -344,7 +336,6 @@ export default function RegisterPage() {
               variant="secondary"
               className="w-full"
               onClick={() => {
-                // Demo fill (handy for Cypress)
                 setFullName("Alex Martin");
                 setEmail(role === "teacher" ? "teacher@university.org" : "student@school.org");
                 setPassword("demo-demo-1234");
