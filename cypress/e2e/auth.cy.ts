@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+/// <reference types="@testing-library/cypress" />
 describe("Auth (demo)", () => {
   it("Home -> Register renders", () => {
     cy.visit("/");
